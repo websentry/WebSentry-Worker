@@ -45,3 +45,7 @@ function sendApiRequest(method, args, binary) {
     });
 
 }
+
+exports.init = init;
+exports.fetchTask = fetchTask;
+exports.submitTask = submitTask;
