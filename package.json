@@ -6,6 +6,8 @@
   },
   "dependencies": {
     "puppeteer": "^1.5.0",
-    "sharp": "^0.20.4"
+    "requestretry": "^1.13.0",
+    "sharp": "^0.20.4",
+    "url-assembler": "^1.2.10"
   }
 }
