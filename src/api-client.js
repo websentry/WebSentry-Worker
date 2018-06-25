@@ -12,10 +12,11 @@ function fetchTask() {
     return sendApiRequest('fetchTask', {}, null);
 }
 
-function submitTask(taskid, feedback, image_buffer) {
+function submitTask(taskid, feedback, msg, image_buffer) {
     args = {}
     args['taskid'] = taskid;
     args['feedback'] = feedback;
+    args['msg'] = msg;
     return sendApiRequest('submitTask', args, feedback);
 }
 
