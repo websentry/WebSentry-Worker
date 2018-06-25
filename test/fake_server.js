@@ -3,6 +3,8 @@ const url = require('url');
 
 const key = 'testkey';
 
+let taskCount = 2;
+
 
 http.createServer(function (req, res) {
     let urlParts = url.parse(req.url);
@@ -62,6 +64,14 @@ function fetchTask(req, res) {
         obj['code'] = -1;
         obj['msg'] = 'Wrong key.';
         responseJson(res, obj);
+        return;
+    }
+
+
+    if (taskCount>=1) {
+        taskCount -= 1;
+    } else {
+        responseJson(res, {code: 0});
         return;
     }
 
