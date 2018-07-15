@@ -17,13 +17,13 @@ http.createServer(function (req, res) {
             res.end();
             break;
 
-        case "/slave/v1/init":
+        case "/v1/slave/init":
             init(req, res);
             break;
-        case "/slave/v1/fetchTask":
+        case "/v1/slave/fetchTask":
             fetchTask(req, res);
             break;
-        case "/slave/v1/submitTask":
+        case "/v1/slave/submitTask":
             submitTask(req, res);
             break;
 

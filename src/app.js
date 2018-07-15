@@ -38,28 +38,28 @@ function doTask() {
     (async () => {
         try {
             const data = await api.fetchTask();
-            if (data['code']<0) throw data;
-            if (data['code']==0) {
-                console.log('[doTask] no more task');
-                // goto waiting state
-                waitForTask();
-                return;
+            if (data['code']!=0) throw data;
+
+            if (data['taskId']<0) {
+                // next long polling request
+                doTask();
+                return
             }
 
-            console.log('[doTask] Task: '+data['taskid']);
+            console.log('[doTask] Task: '+data['taskId']);
             let feedback = 0, msg = "OK", buffer = null;
 
             try {
-                let buffer = await taskHandler.runTask(data['task']);
+                buffer = await taskHandler.runTask(data['task']);
             } catch (e) {
                 feedback = -1;
                 msg = e.toString();
             }
 
             const result =
-                    await api.submitTask(data['taskid'], feedback, msg, buffer);
+                    await api.submitTask(data['taskId'], feedback, msg, buffer);
             if (result['code']<0) throw result;
-            console.log('[doTask] Task done: '+data['taskid']);
+            console.log('[doTask] Task done: '+data['taskId']);
             // start next task
             doTask();
 
@@ -70,13 +70,6 @@ function doTask() {
         }
     })();
 }
-
-// naive implement yet
-// TODO: change to long long polling
-function waitForTask() {
-    setTimeout(doTask, 20*1000);
-}
-
 
 
 exports.main = main;

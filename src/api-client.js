@@ -1,4 +1,4 @@
-var request = require('requestretry');
+const request = require('requestretry');
 const UrlAssembler = require('url-assembler');
 
 const config = require('./../config/config.js');
@@ -9,7 +9,7 @@ function init() {
 }
 
 function fetchTask() {
-    return sendApiRequest('fetchTask', {}, null);
+    return sendApiRequest('fetch_task', {}, null);
 }
 
 function submitTask(taskid, feedback, msg, image_buffer) {
@@ -17,7 +17,7 @@ function submitTask(taskid, feedback, msg, image_buffer) {
     args['taskid'] = taskid;
     args['feedback'] = feedback;
     args['msg'] = msg;
-    return sendApiRequest('submitTask', args, feedback);
+    return sendApiRequest('submit_task', args, image_buffer);
 }
 
 function sendApiRequest(method, args, binary) {
@@ -29,17 +29,29 @@ function sendApiRequest(method, args, binary) {
     return new Promise((resolve, reject) => {
         let option = {
               url: url,
+              method: 'POST',
               json: true,
               maxAttempts: 3,
               retryDelay: 1000,
               retryStrategy: request.RetryStrategies.HTTPOrNetworkError
-            }
+            };
 
-        if (binary !== null) {
-            option['multipart'] = [{body: binary}];
+
+        if (binary != null) {
+
+            option['formData'] = {'image': {
+                    'value': binary,
+                    'options': {
+                      'filename': 'image.jpg',
+                      'contentType': 'image/jpeg'
+                    }
+                  }
+                };
         }
 
-        request.post(option, function(err, response, body){
+
+
+        request(option, function(err, response, body){
             if (err) reject(err)
             else resolve(body);
         });
