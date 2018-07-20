@@ -58,14 +58,16 @@ function doTask() {
 
             const result =
                     await api.submitTask(data['taskId'], feedback, msg, buffer);
-            if (result['code']<0) throw result;
+            if (result['code']<0) {
+                throw new Error(JSON.stringify(result));
+            }
             console.log('[doTask] Task done: '+data['taskId']);
             // start next task
             doTask();
 
         } catch (e) {
             // connection issue
-            console.log('[doTask] ' + e);
+            console.log('[doTask]' + e);
             setTimeout(establishConnection, 5*1000);
         }
     })();

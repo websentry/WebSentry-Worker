@@ -21,6 +21,9 @@ async function runTask(task) {
                        progressive: task['output']['progressive']};
         buffer = await image.jpeg(options).toBuffer();
     }
+    if (task['output']['type']=='png') {
+        buffer = await image.png().toBuffer();
+    }
 
     await browser.close();
 
