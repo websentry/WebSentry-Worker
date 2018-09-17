@@ -37,8 +37,10 @@ function establishConnection() {
 function doTask() {
     (async () => {
         try {
-            const data = await api.fetchTask();
+            let data = await api.fetchTask();
             if (data['code']!=0) throw data;
+
+            data = data['data'];
 
             if (data['taskId']<0) {
                 // next long polling request

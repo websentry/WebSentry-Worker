@@ -14,7 +14,7 @@ function fetchTask() {
 
 function submitTask(taskid, feedback, msg, image_buffer) {
     args = {}
-    args['taskid'] = taskid;
+    args['taskId'] = taskid;
     args['feedback'] = feedback;
     args['msg'] = msg;
     return sendApiRequest('submit_task', args, image_buffer);
