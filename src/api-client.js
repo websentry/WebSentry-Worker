@@ -22,13 +22,15 @@ function submitTask(taskid, feedback, msg, image_buffer) {
 
 function sendApiRequest(method, args, binary) {
     args['sid'] = config.slave_id;
-    args['key'] = config.key;
     url = UrlAssembler(config.api_server).template(method).query(args)
                                                                 .toString();
 
     return new Promise((resolve, reject) => {
         let option = {
               url: url,
+              headers: {
+                'WS-Slave-Key': config.key
+              },
               method: 'POST',
               json: true,
               maxAttempts: 3,
