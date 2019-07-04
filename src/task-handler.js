@@ -2,7 +2,10 @@ const puppeteer = require('puppeteer');
 const sharp = require('sharp');
 
 async function runTask(task) {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+        executablePath: 'google-chrome-unstable',
+        args: ['--disable-dev-shm-usage']
+    });
     const page = await browser.newPage();
 
     let viewport = task['viewport'];
