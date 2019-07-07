@@ -2,55 +2,64 @@ const taskHandler = require('./task-handler.js');
 const api = require('./api-client.js');
 
 
-
-function main() {
-    establishConnection()
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-// the client has 3 state:
-//    1. establishing connection
-//    2. working
-//    3. waiting
+function log(msg) {
+    var now = new Date();
+    var date = now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate();
+    var time = now.getHours() + ":" + now.getMinutes() + ":" + now.getSeconds();
+    var dateTime = date + ' ' + time;
+    console.log(dateTime + ": " + msg);
+}
 
-function establishConnection() {
-    (async () => {
+async function main() {
+    while (true) {
+        if (!await establishConnection()) {
+            return;
+        }
+
+        await doTask();
+    }
+}
+
+async function establishConnection() {
+    while (true) {
         try {
             data = await api.init();
             if (data['code']<0) {
-                console.log('[establishConnection] ' + data);
-                return;
+                log('[establishConnection] ' + data);
+                return false;
             } else {
-                console.log('[establishConnection] success');
-                // success, goto working state
-                doTask();
-                return;
+                log('[establishConnection] success');
+                return true;
             }
         } catch (e) {
-            console.log('[establishConnection] ' + e);
-            console.log('retry after 2 mins');
-
-            setTimeout(establishConnection, 2*60*1000);
+            log('[establishConnection] ' + e);
+            log('retry after 2 mins');
+            await sleep(2 * 60 * 1000);
         }
-    })();
+    }
 }
 
-function doTask() {
-    (async () => {
+async function doTask() {
+    while (true) {
         try {
-            let data = await api.fetchTask();
-            if (data['code']!=0) throw data;
-
-            data = data['data'];
-
-            if (data['taskId']<0) {
-                // next long polling request
-                doTask();
-                return
+            // long polling
+            let data;
+            while (true) {
+                data = await api.fetchTask();
+                if (data['code'] != 0) throw data;
+                data = data['data'];
+                if (data['taskId'] >= 0) {
+                    break;
+                }
             }
 
-            console.log('[doTask] Task: '+data['taskId']);
+            log('[doTask] Task: ' + data['taskId']);
             let feedback = 0, msg = "OK", buffer = null;
-
+            
             try {
                 buffer = await taskHandler.runTask(data['task']);
             } catch (e) {
@@ -60,19 +69,17 @@ function doTask() {
 
             const result =
                     await api.submitTask(data['taskId'], feedback, msg, buffer);
-            if (result['code']<0) {
+            if (result['code'] < 0) {
                 throw new Error(JSON.stringify(result));
             }
-            console.log('[doTask] Task done: '+data['taskId']);
-            // start next task
-            doTask();
-
+            log('[doTask] Task done: ' + data['taskId']);
         } catch (e) {
             // connection issue
-            console.log('[doTask]' + e);
-            setTimeout(establishConnection, 5*1000);
+            log('[doTask] ' + e);
+            await sleep(5 * 1000);
+            return;
         }
-    })();
+    }
 }
 
 

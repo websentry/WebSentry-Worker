@@ -6,31 +6,38 @@ async function runTask(task) {
         executablePath: 'google-chrome-unstable',
         args: ['--disable-dev-shm-usage']
     });
-    const page = await browser.newPage();
+    
+    try {
 
-    let viewport = task['viewport'];
-    if (viewport['height'] === undefined) viewport['height'] = 1024;
+        const page = await browser.newPage();
 
-    await page.setViewport(viewport);
-    await page.goto(task['url'], {timeout: task['timeout']});
-    let options = {fullPage: task['fullPage'], clip: task['clip']};
+        let viewport = task['viewport'];
+        if (viewport['height'] === undefined) viewport['height'] = 1024;
+    
+        await page.setViewport(viewport);
+        await page.goto(task['url'], {timeout: task['timeout']});
+        let options = {fullPage: task['fullPage'], clip: task['clip']};
+    
+        const image = sharp(await page.screenshot(options));
+    
+        let buffer;
+    
+        if (task['output']['type'] === 'jpg') {
+            let options = {
+                quality: task['output']['quality'],
+                progressive: task['output']['progressive']
+            };
+            buffer = await image.jpeg(options).toBuffer();
+        }
+        if (task['output']['type'] === 'png') {
+            buffer = await image.png().toBuffer();
+        }
+        
+        return buffer;
 
-    const image = sharp(await page.screenshot(options));
-
-    let buffer;
-
-    if (task['output']['type']=='jpg') {
-        let options = {quality: task['output']['quality'],
-                       progressive: task['output']['progressive']};
-        buffer = await image.jpeg(options).toBuffer();
+    } finally {
+        await browser.close();
     }
-    if (task['output']['type']=='png') {
-        buffer = await image.png().toBuffer();
-    }
-
-    await browser.close();
-
-    return buffer;
 }
 
 exports.runTask = runTask;
