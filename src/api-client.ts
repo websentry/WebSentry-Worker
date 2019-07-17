@@ -13,7 +13,7 @@ function fetchTask() {
 }
 
 function submitTask(taskid, feedback, msg, image_buffer) {
-    args = {}
+    let args = {}
     args['taskId'] = taskid;
     args['feedback'] = feedback;
     args['msg'] = msg;
@@ -22,7 +22,7 @@ function submitTask(taskid, feedback, msg, image_buffer) {
 
 function sendApiRequest(method, args, binary) {
     args['sid'] = config.slave_id;
-    url = UrlAssembler(config.api_server).template(method).query(args)
+    let url = UrlAssembler(config.api_server).template(method).query(args)
                                                                 .toString();
 
     return new Promise((resolve, reject) => {
