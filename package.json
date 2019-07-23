@@ -7,6 +7,7 @@
   },
   "dependencies": {
     "@types/node": "^12.6.6",
+    "dotenv": "^8.0.0",
     "puppeteer": "^1.18.1",
     "requestretry": "^1.13.0",
     "sharp": "^0.20.8",

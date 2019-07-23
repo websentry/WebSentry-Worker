@@ -1,5 +1,5 @@
-const taskHandler = require('./task-handler');
-const api = require('./api-client');
+import * as taskHandler from './task-handler';
+import * as api from './api-client';
 
 
 function sleep(ms) {
@@ -83,4 +83,4 @@ async function doTask() {
 }
 
 
-exports.main = main;
+export {main};

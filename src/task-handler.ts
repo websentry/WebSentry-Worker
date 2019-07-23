@@ -1,5 +1,5 @@
-const puppeteer = require('puppeteer');
-const sharp = require('sharp');
+import * as puppeteer from 'puppeteer';
+import * as sharp from 'sharp';
 
 async function runTask(task) {
     const browser = await puppeteer.launch({
@@ -40,4 +40,4 @@ async function runTask(task) {
     }
 }
 
-exports.runTask = runTask;
+export {runTask};

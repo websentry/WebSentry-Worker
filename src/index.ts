@@ -1,3 +1,3 @@
-const app = require('./app');
+import * as app from './app';
 
-app.main()
+app.main();
