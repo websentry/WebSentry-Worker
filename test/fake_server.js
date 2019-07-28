@@ -1,9 +1,11 @@
 const http = require('http');
 const url = require('url');
+const formidable = require('formidable');
+
 
 const key = 'testkey';
 
-let taskCount = 2;
+let taskCount = 1;
 
 
 http.createServer(function (req, res) {
@@ -20,10 +22,10 @@ http.createServer(function (req, res) {
         case "/v1/slave/init":
             init(req, res);
             break;
-        case "/v1/slave/fetchTask":
+        case "/v1/slave/fetch_task":
             fetchTask(req, res);
             break;
-        case "/v1/slave/submitTask":
+        case "/v1/slave/submit_task":
             submitTask(req, res);
             break;
 
@@ -42,17 +44,26 @@ function responseJson(res, obj) {
     res.end();
 }
 
+function checkKey(req, res) {
+    if (req.headers['ws-slave-key'] != key) {
+        let obj = {};
+        obj['code'] = -1;
+        obj['msg'] = 'Wrong key.';
+        responseJson(res, obj);
+        return false;
+    }
+    return true;
+}
+
 
 function init(req, res) {
     let query = url.parse(req.url, true).query;
     let obj = {};
-    if (query['key'] == key) {
-        obj['code'] = 1;
-        obj['msg'] = 'OK';
-    } else {
-        obj['code'] = -1;
-        obj['msg'] = 'Wrong key.';
-    }
+    
+    if (!checkKey(req, res)) return;
+
+    obj['code'] = 0;
+    obj['msg'] = 'OK';
     responseJson(res, obj);
 }
 
@@ -60,18 +71,14 @@ function fetchTask(req, res) {
     let query = url.parse(req.url, true).query;
     let obj = {};
 
-    if (query['key'] != key) {
-        obj['code'] = -1;
-        obj['msg'] = 'Wrong key.';
-        responseJson(res, obj);
-        return;
-    }
-
+    if (!checkKey(req, res)) return;
 
     if (taskCount>=1) {
         taskCount -= 1;
     } else {
-        responseJson(res, {code: 0});
+        setTimeout(function() {
+            responseJson(res, {code: 0, data: {taskId: -1}});
+        }, 30 * 1000);
         return;
     }
 
@@ -97,29 +104,33 @@ function fetchTask(req, res) {
         }
     };
 
-    obj['code'] = 1;
+    obj['code'] = 0;
     obj['msg'] = 'OK';
-    obj['taskid'] = 1001;
-    obj['task'] = task;
+    obj['data'] = {};
+    obj['data']['taskId'] = 1001;
+    obj['data']['task'] = task;
 
     responseJson(res, obj);
 }
 
 function submitTask(req, res) {
-    let query = url.parse(req.url, true).query;
-    let obj = {};
+    var form = new formidable.IncomingForm();
+    form.uploadDir = "./tmpdir";
+    form.parse(req, function (err, fields, files) {
+        console.log(err);
+        console.log(files);
+        console.log(req.headers);
 
-    if (query['key'] != key) {
-        obj['code'] = -1;
-        obj['msg'] = 'Wrong key.';
+        let query = url.parse(req.url, true).query;
+        let obj = {};
+    
+        if (!checkKey(req, res)) return;
+    
+        console.log(query);
+    
+        obj['code'] = 1;
+        obj['msg'] = 'OK';
+    
         responseJson(res, obj);
-        return;
-    }
-
-    console.log(query);
-
-    obj['code'] = 1;
-    obj['msg'] = 'OK';
-
-    responseJson(res, obj);
-}
+    });
+};
