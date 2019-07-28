@@ -28,8 +28,8 @@ async function establishConnection() {
     while (true) {
         try {
             let data = await api.init();
-            if (data['code']<0) {
-                log('[establishConnection] ' + data);
+            if (data['code'] < 0) {
+                log('[establishConnection] ' + JSON.stringify(data));
                 return false;
             } else {
                 log('[establishConnection] success');
@@ -75,7 +75,7 @@ async function doTask() {
             log('[doTask] Task done: ' + data['taskId']);
         } catch (e) {
             // connection issue
-            log('[doTask] ' + e);
+            log('[doTask] Error:' + JSON.stringify(e));
             await sleep(5 * 1000);
             return;
         }

@@ -1,64 +1,59 @@
-import * as request from 'requestretry';
-import * as UrlAssembler from 'url-assembler';
+import axios, { AxiosRequestConfig } from 'axios';
+import * as FormData from 'form-data';
 
 import {config} from "./config";
 
 
-function init() {
-    return sendApiRequest('init', {}, null);
+async function init() {
+    return await sendApiRequest('init', {}, null);
 }
 
-function fetchTask() {
-    return sendApiRequest('fetch_task', {}, null);
+async function fetchTask() {
+    return await sendApiRequest('fetch_task', {}, null);
 }
 
-function submitTask(taskid, feedback, msg, image_buffer) {
+async function submitTask(taskid, feedback, msg, image_buffer) {
     let args = {}
     args['taskId'] = taskid;
     args['feedback'] = feedback;
     args['msg'] = msg;
-    return sendApiRequest('submit_task', args, image_buffer);
+
+    // retry
+    let retry = 0;
+    while (true) {
+        try {
+            let data = await sendApiRequest('submit_task', args, image_buffer);
+            return data;
+        } catch (error) {
+            // TODO: log
+            if (retry >= 3) {
+                throw( error );
+            }
+        }
+        retry++;
+    }
 }
 
-function sendApiRequest(method, args, binary) {
-    args['sid'] = config.slaveId;
-    let url = UrlAssembler(config.apiServer).template(method).query(args)
-                                                                .toString();
+async function sendApiRequest(method, args, binary) {
+    let options : AxiosRequestConfig = {
+        url: config.apiServer + method,
+        method: 'post',
+        params: args,
+        headers: {},
+    };
 
-    return new Promise((resolve, reject) => {
-        let option = {
-              url: url,
-              headers: {
-                'WS-Slave-Key': config.slaveKey
-              },
-              method: 'POST',
-              json: true,
-              maxAttempts: 3,
-              retryDelay: 1000,
-              retryStrategy: request.RetryStrategies.HTTPOrNetworkError
-            };
+    if (binary != null) {
+        let form = new FormData();
+        form.append('image', binary, 'image.jpg');
 
+        options.data = form;
+        options.headers = form.getHeaders();
+    }
 
-        if (binary != null) {
+    options.headers['WS-Slave-Key'] = config.slaveKey;
 
-            option['formData'] = {'image': {
-                    'value': binary,
-                    'options': {
-                      'filename': 'image.jpg',
-                      'contentType': 'image/jpeg'
-                    }
-                  }
-                };
-        }
-
-
-
-        request(option, function(err, response, body){
-            if (err) reject(err)
-            else resolve(body);
-        });
-    });
-
+    let res = await axios.request(options);
+    return res.data;
 }
 
 export {init, fetchTask, submitTask};

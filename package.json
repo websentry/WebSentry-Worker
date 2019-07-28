@@ -7,11 +7,11 @@
   },
   "dependencies": {
     "@types/node": "^12.6.6",
+    "axios": "^0.19.0",
     "dotenv": "^8.0.0",
+    "form-data": "^2.5.0",
     "puppeteer": "^1.18.1",
-    "requestretry": "^1.13.0",
     "sharp": "^0.20.8",
-    "typescript": "^3.5.3",
-    "url-assembler": "^1.2.10"
+    "typescript": "^3.5.3"
   }
 }
