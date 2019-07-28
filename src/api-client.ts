@@ -1,7 +1,7 @@
-const request = require('requestretry');
-const UrlAssembler = require('url-assembler');
+import * as request from 'requestretry';
+import * as UrlAssembler from 'url-assembler';
 
-const config = require('./../config/config.js');
+import {config} from "./config";
 
 
 function init() {
@@ -13,7 +13,7 @@ function fetchTask() {
 }
 
 function submitTask(taskid, feedback, msg, image_buffer) {
-    args = {}
+    let args = {}
     args['taskId'] = taskid;
     args['feedback'] = feedback;
     args['msg'] = msg;
@@ -21,15 +21,15 @@ function submitTask(taskid, feedback, msg, image_buffer) {
 }
 
 function sendApiRequest(method, args, binary) {
-    args['sid'] = config.slave_id;
-    url = UrlAssembler(config.api_server).template(method).query(args)
+    args['sid'] = config.slaveId;
+    let url = UrlAssembler(config.apiServer).template(method).query(args)
                                                                 .toString();
 
     return new Promise((resolve, reject) => {
         let option = {
               url: url,
               headers: {
-                'WS-Slave-Key': config.key
+                'WS-Slave-Key': config.slaveKey
               },
               method: 'POST',
               json: true,
@@ -61,6 +61,4 @@ function sendApiRequest(method, args, binary) {
 
 }
 
-exports.init = init;
-exports.fetchTask = fetchTask;
-exports.submitTask = submitTask;
+export {init, fetchTask, submitTask};

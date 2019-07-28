@@ -1,5 +1,5 @@
-const taskHandler = require('./task-handler.js');
-const api = require('./api-client.js');
+import * as taskHandler from './task-handler';
+import * as api from './api-client';
 
 
 function sleep(ms) {
@@ -27,7 +27,7 @@ async function main() {
 async function establishConnection() {
     while (true) {
         try {
-            data = await api.init();
+            let data = await api.init();
             if (data['code']<0) {
                 log('[establishConnection] ' + data);
                 return false;
@@ -83,4 +83,4 @@ async function doTask() {
 }
 
 
-exports.main = main;
+export {main};
