@@ -36,8 +36,7 @@ RUN npm install
 # Bundle app source
 COPY . .
 
-RUN npm run build \
-    && rm -rf ./src
+RUN npm run build
 
 ENTRYPOINT ["dumb-init", "--"]
 CMD [ "npm", "start" ]
