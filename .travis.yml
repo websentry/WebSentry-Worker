@@ -1,0 +1,19 @@
+language: node_js
+
+node_js:
+  - "10"
+
+# Skip downloading chromium
+env:
+  - PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
+# Only clone the most recent commit.
+git:
+  depth: 1
+
+# Don't email me
+notifications:
+  email: false
+
+script:
+  - npm run build
