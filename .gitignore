@@ -1,6 +1,4 @@
-
-# config file
-config/config.js
+/dist
 
 # Created by https://www.gitignore.io/api/node,macos,windows
 
