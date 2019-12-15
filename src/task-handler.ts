@@ -6,22 +6,26 @@ async function runTask(task) {
         executablePath: 'google-chrome-unstable',
         args: ['--disable-dev-shm-usage']
     });
-    
+
     try {
 
         const page = await browser.newPage();
 
         let viewport = task['viewport'];
         if (viewport['height'] === undefined) viewport['height'] = 1024;
-    
+
         await page.setViewport(viewport);
-        await page.goto(task['url'], {timeout: task['timeout']});
-        let options = {fullPage: task['fullPage'], clip: task['clip']};
-    
-        const image = sharp(await page.screenshot(options));
-    
+        await page.goto(task['url'], {
+            timeout: task['timeout'],
+            waitUntil: "networkidle2"
+        });
+
+        const image = sharp(await page.screenshot({
+            fullPage: task['fullPage'],
+            clip: task['clip']
+        }));
+
         let buffer;
-    
         if (task['output']['type'] === 'jpg') {
             let options = {
                 quality: task['output']['quality'],
@@ -32,7 +36,7 @@ async function runTask(task) {
         if (task['output']['type'] === 'png') {
             buffer = await image.png().toBuffer();
         }
-        
+
         return buffer;
 
     } finally {
@@ -40,4 +44,4 @@ async function runTask(task) {
     }
 }
 
-export {runTask};
+export { runTask };

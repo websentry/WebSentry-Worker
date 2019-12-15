@@ -6,6 +6,7 @@ const formidable = require('formidable');
 const key = 'testkey';
 
 let taskCount = 1;
+let startTime = null;
 
 
 http.createServer(function (req, res) {
@@ -111,6 +112,7 @@ function fetchTask(req, res) {
     obj['data']['task'] = task;
 
     responseJson(res, obj);
+    startTime = new Date();
 }
 
 function submitTask(req, res) {
@@ -132,5 +134,7 @@ function submitTask(req, res) {
         obj['msg'] = 'OK';
     
         responseJson(res, obj);
+        let timeUsed = ((new Date()).getTime() - startTime.getTime()) / 1000;
+        console.log("Time used: " + timeUsed + "s");
     });
 };
