@@ -8,7 +8,6 @@ async function runTask(task) {
     });
 
     try {
-
         const page = await browser.newPage();
 
         let viewport = task['viewport'];
@@ -19,6 +18,11 @@ async function runTask(task) {
             timeout: task['timeout'],
             waitUntil: "networkidle2"
         });
+
+        let waitBeforeScreenshot = task['waitBeforeScreenshot'];
+        // defualt value is 0.8 sec
+        if (waitBeforeScreenshot === undefined) waitBeforeScreenshot = 800;
+        await page.waitFor(waitBeforeScreenshot);
 
         const image = sharp(await page.screenshot({
             fullPage: task['fullPage'],
@@ -38,7 +42,6 @@ async function runTask(task) {
         }
 
         return buffer;
-
     } finally {
         await browser.close();
     }
