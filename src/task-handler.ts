@@ -3,7 +3,6 @@ import * as sharp from 'sharp';
 
 async function runTask(task) {
     const browser = await puppeteer.launch({
-        executablePath: 'google-chrome-unstable',
         args: ['--disable-dev-shm-usage']
     });
 

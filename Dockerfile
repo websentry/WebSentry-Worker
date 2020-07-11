@@ -1,24 +1,22 @@
-FROM node:10-slim
+# Need to be run with --init --cap-add=SYS_ADMIN
 
-RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
+FROM node:12-slim
+
+RUN apt-get update \
+    && apt-get install -y wget gnupg \
+    && wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list' \
     && apt-get update \
-    && apt-get install -y google-chrome-unstable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst ttf-freefont \
+    && apt-get install -y google-chrome-unstable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf \
       --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-# If running Docker >= 1.13.0 use docker run's --init arg to reap zombie processes, otherwise
-# uncomment the following lines to have `dumb-init` as PID 1
-ADD https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64 /usr/local/bin/dumb-init
-RUN chmod +x /usr/local/bin/dumb-init
-
 # Skip downloading chromium
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD true
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true PUPPETEER_EXECUTABLE_PATH="/usr/bin/google-chrome-unstable"
 
 # Create app directory
 WORKDIR /usr/src/app
 
-# Install puppeteer so it's available in the container.
 # Add user so we don't need --no-sandbox.
 # same layer as npm install to keep re-chowned files from using up several hundred MBs more space
 RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
@@ -30,7 +28,7 @@ RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
 USER pptruser
 
 # Install app dependencies
-COPY package.json ./
+COPY package*.json ./
 RUN npm install
 
 # Bundle app source
@@ -38,5 +36,4 @@ COPY . .
 
 RUN npm run build
 
-ENTRYPOINT ["dumb-init", "--"]
 CMD [ "npm", "start" ]
