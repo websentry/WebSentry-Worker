@@ -41,7 +41,7 @@ async function sendApiRequest(method, args, binary, is_long_polling) {
     let timeout = is_long_polling ? 120 * 1000 : 10 * 1000;
     let options : AxiosRequestConfig = {
         timeout: timeout,
-        url: config.apiServer + method,
+        url: config.apiServer + "v1/worker/" + method,
         method: 'post',
         params: args,
         headers: {},
@@ -55,7 +55,7 @@ async function sendApiRequest(method, args, binary, is_long_polling) {
         options.headers = form.getHeaders();
     }
 
-    options.headers['WS-Slave-Key'] = config.slaveKey;
+    options.headers['WS-Worker-Key'] = config.workerKey;
 
     let res = await axios.request(options);
     return res.data;

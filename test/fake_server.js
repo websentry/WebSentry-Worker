@@ -20,13 +20,13 @@ http.createServer(function (req, res) {
             res.end();
             break;
 
-        case "/v1/slave/init":
+        case "/v1/worker/init":
             init(req, res);
             break;
-        case "/v1/slave/fetch_task":
+        case "/v1/worker/fetch_task":
             fetchTask(req, res);
             break;
-        case "/v1/slave/submit_task":
+        case "/v1/worker/submit_task":
             submitTask(req, res);
             break;
 
@@ -46,7 +46,7 @@ function responseJson(res, obj) {
 }
 
 function checkKey(req, res) {
-    if (req.headers['ws-slave-key'] != key) {
+    if (req.headers['ws-worker-key'] != key) {
         let obj = {};
         obj['code'] = -1;
         obj['msg'] = 'Wrong key.';
