@@ -2,14 +2,14 @@ import * as dotenv from 'dotenv';
 
 class Config {
     apiServer: string;
-    slaveKey: string;
-    slaveId: string;
+    workerKey: string;
+    workerId: string;
 }
 
 dotenv.config();
 const config = new Config();
 config.apiServer = process.env["WS_API_SERVER"];
-config.slaveKey = process.env["WS_SLAVE_KEY"];
-config.slaveId = process.env["WS_SLAVE_ID"];
+config.workerKey = process.env["WS_WORKER_KEY"];
+config.workerId = process.env["WS_WORKER_ID"];
 
 export {config};
