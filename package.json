@@ -11,7 +11,7 @@
     "dotenv": "^8.2.0",
     "form-data": "^3.0.0",
     "puppeteer": "^5.0.0",
-    "sharp": "^0.25.4",
+    "sharp": "^0.30.5",
     "typescript": "^3.9.6"
   }
 }
